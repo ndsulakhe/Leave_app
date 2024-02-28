@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Leave Application</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f2f2f2;
+        margin: 0;
+        padding: 0;
+    }
+
+    .container {
+        max-width: 400px;
+        margin: 50px auto;
+        background-color: #fff;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+        text-align: center;
+        color: #333;
+    }
+
+    form {
+        margin-top: 20px;
+    }
+
+    label {
+        display: block;
+        margin-bottom: 5px;
+    }
+
+    select, input[type="text"], input[type="date"], input[type="time"], textarea {
+        width: 100%;
+        padding: 8px;
+        margin-bottom: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+    }
+
+    input[type="radio"] {
+        margin-right: 5px;
+    }
+
+    /* Ensure radio buttons for half-day leave are displayed inline */
+    #halfDayFields label,
+    #halfDayFields input[type="radio"] {
+        display: inline;
+    }
+
+    .button-container {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .button-container button {
+        background-color: #4CAF50;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        margin: 0 10px;
+    }
+
+    .button-container button:hover {
+        background-color: #45a049;
+    }
+</style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Leave Application</h1>
+    <form id="leaveForm">
+        <label for="yourName">Your Name:</label>
+        <input type="text" id="yourName" name="yourName" required>
+        <label for="employeeCode">Employee Code:</label>
+        <input type="text" id="employeeCode" name="employeeCode" required>
+        <label for="leaveType">Leave Type:</label>
+        <select id="leaveType" onchange="showFields()" required>
+            <option value="" disabled selected>Select Leave Type</option>
+            <option value="lateComing" data-label="Late Coming">Late Coming</option>
+            <option value="halfDay" data-label="Half Day Leave">Half Day Leave</option>
+            <option value="fullDay" data-label="Full Day Leave">Full Day Leave</option>
+        </select>
+        <div id="lateComingFields" style="display:none;">
+            <label for="lateTime">Late Time:</label>
+            <input type="time" id="lateTime" name="lateTime">
+        </div>
+        <div id="halfDayFields" style="display:none;">
+            <label>Half Day:</label>
+            <label for="firstHalf"><input type="radio" id="firstHalf" name="halfDay" value="First Half">First Half</label>
+            <label for="secondHalf"><input type="radio" id="secondHalf" name="halfDay" value="Second Half">Second Half</label>
+        </div>
+        <div id="fullDayFields" style="display:none;">
+            <label for="fromDate">From Date:</label>
+            <input type="date" id="fromDate" name="fromDate">
+            <label for="toDate">To Date:</label>
+            <input type="date" id="toDate" name="toDate">
+        </div>
+        <br>
+        <label for="reason">Reason:</label>
+        <textarea id="reason" name="reason" rows="4" required></textarea>
+        <div class="button-container">
+            <button type="button" onclick="validateAndSend()">Send Mail</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    function showFields() {
+        var leaveType = document.getElementById("leaveType").value;
+        var lateComingFields = document.getElementById("lateComingFields");
+        var halfDayFields = document.getElementById("halfDayFields");
+        var fullDayFields = document.getElementById("fullDayFields");
+
+        lateComingFields.style.display = "none";
+        halfDayFields.style.display = "none";
+        fullDayFields.style.display = "none";
+
+        if (leaveType === "lateComing") {
+            lateComingFields.style.display = "block";
+        } else if (leaveType === "halfDay") {
+            halfDayFields.style.display = "block";
+        } else if (leaveType === "fullDay") {
+            fullDayFields.style.display = "block";
+        }
+    }
+
+    function validateAndSend() {
+        var form = document.getElementById("leaveForm");
+        var isValid = form.checkValidity();
+        if (!isValid) {
+            alert("Please fill all required fields.");
+            return;
+        }
+        sendMail();
+    }
+
+    function sendMail() {
+    var yourName = document.getElementById("yourName").value;
+    var employeeCode = document.getElementById("employeeCode").value;
+    var leaveType = document.getElementById("leaveType").value;
+    var leaveLabel = document.querySelector('#leaveType option:checked').getAttribute('data-label');
+    var subject;
+    if (leaveType === "lateComing") {
+        subject = "Late Coming Intimation";
+    } else {
+        subject = "Leave Intimation: " + leaveLabel + " Information";
+    }
+    var body = "Dear Sir,\n\nI am " + yourName + " writing to inform you about my " + leaveLabel.toLowerCase() + ".\n";
+    body += "Employee Code: " + employeeCode + "\n\n";
+    var reason = document.getElementById("reason").value;
+    var mailTo = "gourmohan.pal@nisseiasb.com";
+    var cc = "pratap.sahoo@nisseiasb.com; viral.parekh@nisseiasb.com; shyam.prabhakar@nisseiasb.com; sunil.kumar@nisseiasb.com; nilesh.sulakhe@nisseiasb.com; rakesh.kumar@nisseiasb.com; mayur.patil@nisseiasb.com; ravishankar.choudhary@nisseiasb.com; nilesh.shahane@nisseiasb.com";
+
+    if (leaveType === "lateComing") {
+        var lateTime = document.getElementById("lateTime").value;
+        body += "I will attend office on " + lateTime + ".\n\n";
+    } else if (leaveType === "halfDay") {
+        var halfDay = document.querySelector('input[name="halfDay"]:checked').value;
+        body += "I want to take half-day leave in " + halfDay.toLowerCase() + ".\n\n";
+    } else if (leaveType === "fullDay") {
+        var fromDate = document.getElementById("fromDate").value;
+        var toDate = document.getElementById("toDate").value;
+        // Convert date format to dd-mm-yyyy
+        var fromDateFormatted = formatDate(fromDate);
+        var toDateFormatted = formatDate(toDate);
+        body += "I will be on leave from " + fromDateFormatted + " to " + toDateFormatted + ".\n\n";
+    }
+
+    body += "Reason: " + reason + "\n\n";
+    body += "Thanks & Regards,\n" + yourName;
+
+    // Create a mailto link
+    var mailtoLink = "mailto:" + mailTo + "?cc=" + cc + "&subject=" + encodeURIComponent(subject) + "&body=" + encodeURIComponent(body);
+
+    // Create an anchor element with the mailto link
+    var mailtoAnchor = document.createElement("a");
+    mailtoAnchor.setAttribute("href", mailtoLink);
+
+    // Append the anchor element to the document body
+    document.body.appendChild(mailtoAnchor);
+
+    // Programmatically click on the anchor element
+    mailtoAnchor.click();
+
+    // Remove the anchor element from the document body
+    document.body.removeChild(mailtoAnchor);
+}
+
+
+    function formatDate(dateString) {
+        var parts = dateString.split("-");
+        return parts[2] + "-" + parts[1] + "-" + parts[0];
+    }
+</script>
+
+</body>
+</html>
